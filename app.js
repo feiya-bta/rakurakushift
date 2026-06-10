@@ -1,5 +1,5 @@
 // --- STATE MANAGEMENT ---
-let accounts = JSON.parse(localStorage.getItem('shift_accounts')) || ['ハルト', 'アイン'];
+let accounts = JSON.parse(localStorage.getItem('shift_accounts')) || ['世英'];
 let currentAccount = localStorage.getItem('shift_current_account') || accounts[0] || '';
 let currentYear = 2026;
 let currentMonth = 5; // 0-indexed: 5 = June
