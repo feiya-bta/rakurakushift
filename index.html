@@ -2,181 +2,188 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>シフト管理アプリ</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>らくらくシフト</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Round">
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800 antialiased py-8 px-4">
+<body>
+  <div class="page-shell">
+    <div class="app-card">
 
-  <div class="max-w-md mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
-    
-    <div class="p-6 bg-slate-50/50 border-b border-slate-100 space-y-4">
-      <div class="flex items-center justify-between gap-4">
-        <label class="text-xs font-bold text-slate-500 tracking-wider flex items-center gap-1.5 shrink-0">
-          <i data-lucide="user" class="w-3.5 h-3.5 text-[#7d3b5b]"></i> アカウント:
-        </label>
-        
-        <div class="flex items-center gap-1 flex-1 max-w-[220px]">
-          <select id="custom-dropdown-btn" class="w-full bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-medium text-slate-700 shadow-xs hover:border-slate-300 transition-all focus:outline-none focus:ring-2 focus:ring-[#7d3b5b]/20">
-          </select>
-          
-          <button id="btn-edit-account" title="アカウント名を編集" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all cursor-pointer shrink-0">
-            <i data-lucide="edit-2" class="w-3.5 h-3.5"></i>
-          </button>
-          
-          <button id="btn-delete-account" title="アカウントを削除" class="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all cursor-pointer shrink-0">
-            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+      <!-- ヘッダー：アカウント選択 -->
+      <div class="card-header">
+        <div class="header-top-row">
+          <h1 class="logo">らくらくシフト</h1>
+          <button id="btn-dark-mode" class="icon-button">
+            <span class="material-icons-round" id="dark-mode-icon">dark_mode</span>
           </button>
         </div>
-      </div>
 
-      <div class="flex gap-2">
-        <input type="text" id="new-account-name" placeholder="新しいアカウント名" class="flex-1 bg-white border border-slate-200 rounded-xl px-3 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#7d3b5b]/20 focus:border-[#7d3b5b] transition-all">
-        <button id="btn-create-account" class="bg-[#7d3b5b] hover:bg-[#682e4a] text-white text-xs font-bold px-4 py-1.5 rounded-xl transition-all shadow-xs cursor-pointer">追加</button>
-      </div>
-    </div>
+        <div class="account-row">
+          <label class="account-row-label">
+            <span class="material-icons-round">person</span> アカウント
+          </label>
+          <div class="account-row-controls">
+            <div class="select-wrapper">
+              <select id="custom-dropdown-btn" class="styled-select"></select>
+            </div>
+            <button id="btn-edit-account" title="アカウント名を編集" class="icon-button-sm">
+              <span class="material-icons-round">edit</span>
+            </button>
+            <button id="btn-delete-account" title="アカウントを削除" class="icon-button-sm danger">
+              <span class="material-icons-round">delete</span>
+            </button>
+          </div>
+        </div>
 
-    <div class="flex border-b border-slate-100 bg-slate-50/30 p-2 gap-1">
-      <button id="tab-calendar-btn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer bg-white text-[#7d3b5b] shadow-xs">
-        <i data-lucide="calendar" class="w-3.5 h-3.5"></i> カレンダー & リスト
-      </button>
-      <button id="tab-parser-btn" class="flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-white/50">
-        <i data-lucide="file-text" class="w-3.5 h-3.5"></i> テキスト一括入力
-      </button>
-    </div>
-
-    <div id="content-tab-calendar" class="p-6 space-y-6">
-      <div id="calendar-title" class="flex items-center justify-between">
-        <span class="text-sm font-bold text-slate-800 tracking-tight">2026年 6月</span>
-        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl">
-          <button id="btn-prev-month" class="p-1.5 hover:bg-white rounded-lg transition-all text-slate-600 cursor-pointer"><i data-lucide="chevron-left" class="w-3.5 h-3.5"></i></button>
-          <button id="btn-current-month" class="px-2.5 py-1 text-[11px] font-bold hover:bg-white rounded-lg transition-all text-slate-700 cursor-pointer">今月</button>
-          <button id="btn-next-month" class="p-1.5 hover:bg-white rounded-lg transition-all text-slate-600 cursor-pointer"><i data-lucide="chevron-right" class="w-3.5 h-3.5"></i></button>
+        <div class="inline-form-row">
+          <input type="text" id="new-account-name" placeholder="新しいアカウント名" class="input-line">
+          <button id="btn-create-account" class="primary-button-sm">追加</button>
         </div>
       </div>
 
-      <div class="grid grid-cols-7 gap-1 text-center text-[11px] font-bold text-slate-400">
-        <div class="text-red-400">日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div class="text-blue-400">土</div>
-      </div>
-
-      <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
-
-      <div class="bg-slate-50/70 border border-slate-100 rounded-2xl p-4 flex items-center justify-between">
-        <div id="summary-header" class="text-xs font-bold text-slate-600"><span>6月の勤務サマリー</span></div>
-        <div class="flex gap-4 text-right">
-          <div>
-            <span class="block text-[10px] text-slate-400 font-medium">合計回数</span>
-            <span id="summary-count" class="text-sm font-bold text-slate-800">0回</span>
-          </div>
-          <div>
-            <span class="block text-[10px] text-slate-400 font-medium">合計時間</span>
-            <span class="text-sm font-bold text-slate-800"><span id="summary-hours">0</span>時間</span>
-          </div>
-        </div>
-      </div>
-
-      <hr class="border-slate-100">
-
-      <div class="flex items-center justify-between">
-        <span id="selected-date-badge" class="bg-[#fcf7f9] text-[#7d3b5b] text-xs font-bold px-3 py-1.5 rounded-xl border border-[#7d3b5b]/10"></span>
-        <button id="btn-add-shift-text" class="text-xs font-bold text-[#7d3b5b] hover:text-[#682e4a] flex items-center gap-1 transition-all cursor-pointer">
-          <i data-lucide="plus" class="w-3.5 h-3.5"></i> シフト追加
+      <!-- タブ切り替え -->
+      <div class="section-tabs">
+        <button id="tab-calendar-btn" class="section-tab-btn active">
+          <span class="material-icons-round">calendar_month</span> カレンダー &amp; リスト
+        </button>
+        <button id="tab-parser-btn" class="section-tab-btn">
+          <span class="material-icons-round">description</span> テキスト一括入力
         </button>
       </div>
 
-      <div id="shifts-list-container" class="space-y-2.5"></div>
-    </div>
-
-    <div id="content-tab-parser" class="p-6 space-y-4 hidden">
-      <div class="space-y-1">
-        <h4 class="text-sm font-bold text-slate-800">テキストから一括シフト登録</h4>
-        <p class="text-[11px] text-slate-400 leading-relaxed">
-          略称の文字列フォーマットを解析して一括インプットします。<br>
-          書式例: <code class="bg-slate-100 px-1 py-0.5 rounded font-mono text-[10px] text-slate-600">日付, 開始時間, 終了時間;</code> （セミコロンで区切ると複数件連続で登録できます）
-        </p>
-      </div>
-
-      <textarea id="shorthand-input" placeholder="例: 06/04, 17:30, 23:30; 06/05, 22:00, 29:00" rows="5" class="w-full bg-slate-50 border border-slate-200 rounded-2xl p-3 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-[#7d3b5b]/20 focus:border-[#7d3b5b] transition-all resize-none"></textarea>
-      
-      <div class="flex items-center justify-end gap-2">
-        <button id="btn-sample" class="border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-medium px-4 py-2 rounded-xl transition-all cursor-pointer">サンプルを挿入</button>
-        <button id="btn-parse" class="bg-[#7d3b5b] hover:bg-[#682e4a] text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer">
-          <i data-lucide="zap" class="w-3.5 h-3.5"></i> 解析して取り込む
-        </button>
-      </div>
-    </div>
-
-  </div>
-
-  <div id="modal" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-slate-100 space-y-4">
-      <div id="modal-title" class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <span class="text-sm font-bold text-slate-800">シフト登録フォーム</span>
-        <button id="btn-close-modal" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i data-lucide="x" class="w-4 h-4"></i></button>
-      </div>
-      
-      <div class="space-y-3">
-        <div>
-          <label class="block text-[10px] font-bold text-slate-400 mb-1">日付</label>
-          <input type="date" id="input-shift-date" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
-        </div>
-        <div>
-          <label class="block text-[10px] font-bold text-slate-400 mb-1">タイトル / メモ</label>
-          <input type="text" id="input-shift-title" placeholder="勤務シフト" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none">
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-[10px] font-bold text-slate-400 mb-1">開始時間</label>
-            <input type="text" id="input-shift-start" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-center focus:outline-none">
-          </div>
-          <div>
-            <label class="block text-[10px] font-bold text-slate-400 mb-1">終了時間</label>
-            <input type="text" id="input-shift-end" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-mono text-center focus:outline-none">
+      <!-- カレンダー & リスト -->
+      <div id="content-tab-calendar" class="card-body">
+        <div id="calendar-title" class="calendar-title-bar">
+          <span>2026年 6月</span>
+          <div class="segment-control-mini">
+            <button id="btn-prev-month" class="icon-button-sm"><span class="material-icons-round">chevron_left</span></button>
+            <button id="btn-current-month" class="text-mini-button">今月</button>
+            <button id="btn-next-month" class="icon-button-sm"><span class="material-icons-round">chevron_right</span></button>
           </div>
         </div>
+
+        <div class="weekday-row">
+          <div class="weekday-sun">日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div class="weekday-sat">土</div>
+        </div>
+
+        <div id="calendar-grid" class="calendar-grid"></div>
+
+        <div class="summary-card">
+          <div id="summary-header" class="summary-label"><span>6月の勤務サマリー</span></div>
+          <div class="summary-figures">
+            <div class="summary-figure">
+              <span class="summary-figure-label">合計回数</span>
+              <span id="summary-count" class="summary-figure-value">0回</span>
+            </div>
+            <div class="summary-figure">
+              <span class="summary-figure-label">合計時間</span>
+              <span class="summary-figure-value"><span id="summary-hours">0</span>時間</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <div class="list-header-row">
+          <span id="selected-date-badge" class="pill-badge"></span>
+          <button id="btn-add-shift-text" class="add-link-btn">
+            <span class="material-icons-round">add</span> シフト追加
+          </button>
+        </div>
+
+        <div id="shifts-list-container" class="timeline"></div>
       </div>
 
-      <div class="flex items-center justify-between gap-2 pt-2">
-        <button id="btn-delete-modal" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-4 py-2 rounded-xl transition-all cursor-pointer">削除</button>
-        <div class="flex items-center gap-2 ml-auto">
-          <button id="btn-save-modal" class="bg-[#7d3b5b] hover:bg-[#682e4a] text-white text-xs font-bold px-5 py-2 rounded-xl transition-all shadow-xs cursor-pointer">保存する</button>
+      <!-- テキスト一括入力 -->
+      <div id="content-tab-parser" class="card-body hidden">
+        <div class="parser-intro">
+          <h4>テキストから一括シフト登録</h4>
+          <p>
+            略称の文字列フォーマットを解析して一括インプットします。<br>
+            書式例: <code>日付, 開始時間, 終了時間;</code> （セミコロンで区切ると複数件連続で登録できます）
+          </p>
+        </div>
+
+        <textarea id="shorthand-input" placeholder="例: 06/04, 17:30, 23:30; 06/05, 22:00, 29:00" rows="5" class="textarea-line"></textarea>
+
+        <div class="parser-actions">
+          <button id="btn-sample" class="secondary-button-sm">サンプルを挿入</button>
+          <button id="btn-parse" class="primary-button-sm">
+            <span class="material-icons-round">bolt</span> 解析して取り込む
+          </button>
         </div>
       </div>
+
     </div>
   </div>
 
-  <div id="account-dialog-overlay" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-end justify-center p-4 z-50 transition-all duration-300 opacity-0">
-    <div id="account-dialog-sheet" class="bg-white rounded-t-3xl rounded-b-xl w-full max-w-md p-6 shadow-2xl border border-slate-100 space-y-4 translate-y-10 transition-all duration-300">
-      
-      <div class="flex items-center gap-2.5 border-b border-slate-100 pb-3">
-        <div id="account-dialog-icon-bg" class="p-2 rounded-xl bg-amber-50 border border-amber-200">
-          <i id="account-dialog-icon" data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
-        </div>
-        <div>
-          <h4 id="account-dialog-title" class="text-xs font-bold text-slate-800 tracking-tight">タイトル</h4>
-          <p id="account-dialog-desc" class="text-[10px] text-slate-400 mt-0.5">説明文</p>
-        </div>
-      </div>
-      
-      <div id="account-dialog-input-wrapper" class="hidden">
-        <label class="block text-[10px] font-bold text-slate-400 mb-1.5">アカウント名</label>
-        <input type="text" id="account-dialog-input" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-[#7d3b5b]/20 focus:border-[#7d3b5b] transition-all">
+  <!-- シフト登録モーダル -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <div id="modal-title" class="modal-header">
+        <span>シフト登録フォーム</span>
+        <button id="btn-close-modal" class="close-button">閉じる</button>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button id="btn-account-dialog-cancel" class="flex-1 sm:flex-initial bg-slate-50 hover:bg-slate-100 text-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer">
-          いいえ
-        </button>
-        <button id="btn-account-dialog-confirm" class="flex-1 sm:flex-initial bg-[#7d3b5b] hover:bg-[#682e4a] text-white text-xs font-bold px-5 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer">
-          はい
-        </button>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>日付</label>
+          <input type="date" id="input-shift-date" class="input-line">
+        </div>
+        <div class="form-group">
+          <label>タイトル / メモ</label>
+          <input type="text" id="input-shift-title" placeholder="勤務シフト" class="input-line">
+        </div>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label>開始時間</label>
+            <input type="text" id="input-shift-start" class="input-line mono-center">
+          </div>
+          <div class="form-group">
+            <label>終了時間</label>
+            <input type="text" id="input-shift-end" class="input-line mono-center">
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer split">
+        <button id="btn-delete-modal" class="text-danger-button hidden">削除</button>
+        <button id="btn-save-modal" class="primary-button">保存する</button>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2.5 rounded-xl shadow-xl transition-all duration-300 opacity-0 flex items-center gap-2 z-50">
-    <i data-lucide="info" class="w-4 h-4 text-amber-300"></i>
+  <!-- アカウント確認ダイアログ（予備UI） -->
+  <div id="account-dialog-overlay" class="dialog-overlay hidden">
+    <div id="account-dialog-sheet" class="dialog-sheet">
+      <div class="dialog-header">
+        <div id="account-dialog-icon-bg" class="dialog-icon-bg">
+          <span id="account-dialog-icon" class="material-icons-round">warning</span>
+        </div>
+        <div>
+          <h4 id="account-dialog-title">タイトル</h4>
+          <p id="account-dialog-desc">説明文</p>
+        </div>
+      </div>
+
+      <div id="account-dialog-input-wrapper" class="form-group hidden">
+        <label>アカウント名</label>
+        <input type="text" id="account-dialog-input" class="input-line">
+      </div>
+
+      <div class="dialog-actions">
+        <button id="btn-account-dialog-cancel" class="secondary-button">いいえ</button>
+        <button id="btn-account-dialog-confirm" class="primary-button">はい</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- トースト通知 -->
+  <div id="toast" class="toast hidden">
+    <span class="material-icons-round toast-icon">info</span>
     <span id="toast-text"></span>
   </div>
 
