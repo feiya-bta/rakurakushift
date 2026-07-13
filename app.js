@@ -1,9 +1,10 @@
 // --- STATE MANAGEMENT ---
 let accounts = JSON.parse(localStorage.getItem('shift_accounts')) || ['世英'];
 let currentAccount = localStorage.getItem('shift_current_account') || accounts[0] || '';
-let currentYear = 2026;
-let currentMonth = 5; // 0-indexed: 5 = June
-let selectedDateStr = '2026-06-04';
+const today = new Date();
+let currentYear = today.getFullYear();
+let currentMonth = today.getMonth();
+let selectedDateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 let shiftsData = JSON.parse(localStorage.getItem('shifts_data')) || {};
 
 // --- DOM ELEMENTS ---
@@ -48,6 +49,33 @@ const tabParserBtn = document.getElementById('tab-parser-btn');
 const contentTabCalendar = document.getElementById('content-tab-calendar');
 const contentTabParser = document.getElementById('content-tab-parser');
 
+// --- DARK MODE TOGGLE (見た目のみ／機能への影響なし) ---
+const btnDarkMode = document.getElementById('btn-dark-mode');
+const darkModeIcon = document.getElementById('dark-mode-icon');
+
+function initDarkMode() {
+  const saved = localStorage.getItem('shift_theme');
+  if (saved === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    if (darkModeIcon) darkModeIcon.textContent = 'light_mode';
+  }
+}
+
+function toggleDarkMode() {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  if (isDark) {
+    document.documentElement.removeAttribute('data-theme');
+    localStorage.setItem('shift_theme', 'light');
+    if (darkModeIcon) darkModeIcon.textContent = 'dark_mode';
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('shift_theme', 'dark');
+    if (darkModeIcon) darkModeIcon.textContent = 'light_mode';
+  }
+}
+
+if (btnDarkMode) btnDarkMode.onclick = toggleDarkMode;
+
 let editingShiftId = null;
 
 // --- TOAST NOTIFICATION ---
@@ -64,19 +92,19 @@ function showToast(message) {
 // --- TAB ROUTING ENGINE MANAGEMENT ---
 function switchTab(targetTab) {
   if (targetTab === 'calendar') {
-    tabCalendarBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer bg-white text-[#7d3b5b] shadow-xs';
-    tabParserBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-white/50';
-    
+    tabCalendarBtn.classList.add('active');
+    tabParserBtn.classList.remove('active');
+
     contentTabCalendar.classList.remove('hidden');
     contentTabParser.classList.add('hidden');
-    
+
     renderCalendar();
     renderShiftsList();
     updateSummary();
   } else if (targetTab === 'parser') {
-    tabParserBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer bg-white text-[#7d3b5b] shadow-xs';
-    tabCalendarBtn.className = 'flex-1 py-2.5 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer text-slate-500 hover:text-slate-800 hover:bg-white/50';
-    
+    tabParserBtn.classList.add('active');
+    tabCalendarBtn.classList.remove('active');
+
     contentTabParser.classList.remove('hidden');
     contentTabCalendar.classList.add('hidden');
   }
@@ -147,7 +175,7 @@ function renderCalendar() {
   for (let i = firstDayIndex; i > 0; i--) {
     const dayNum = prevMonthTotalDays - i + 1;
     const cell = document.createElement('div');
-    cell.className = 'bg-slate-100/50 text-slate-300 rounded-xl p-1 text-[11px] font-medium h-16 text-left opacity-40';
+    cell.className = 'calendar-cell pad';
     cell.textContent = dayNum;
     calendarGrid.appendChild(cell);
   }
@@ -157,23 +185,23 @@ function renderCalendar() {
     const cell = document.createElement('div');
     const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const isSelected = dateStr === selectedDateStr;
-    
-    cell.className = `bg-white rounded-xl p-1 text-[11px] font-semibold h-16 text-left border border-slate-100 flex flex-col justify-between cursor-pointer transition-all hover:border-[#7d3b5b]/40 ${isSelected ? 'ring-2 ring-[#7d3b5b] bg-[#fcf7f9]' : ''}`;
-    
+
+    cell.className = `calendar-cell ${isSelected ? 'selected' : ''}`;
+
     const dayLabel = document.createElement('div');
     dayLabel.textContent = day;
     cell.appendChild(dayLabel);
 
     if (accountShifts[dateStr] && accountShifts[dateStr].length > 0) {
       const shiftContainer = document.createElement('div');
-      shiftContainer.className = 'w-full flex flex-col gap-0.5 mt-auto';
-      
+      shiftContainer.className = 'shift-chip-list';
+
       accountShifts[dateStr].forEach(shift => {
         const block = document.createElement('div');
-        block.className = 'bg-[#f2e7ec] text-[#4b4e53] text-[8px] px-1 py-0.5 rounded flex flex-col items-center justify-center font-mono font-medium leading-none tracking-tighter';
+        block.className = 'shift-chip';
         block.innerHTML = `
           <span>${shift.start}</span>
-          <span class="opacity-60 scale-75 leading-[4px]">↓</span>
+          <span class="arrow">↓</span>
           <span>${shift.end}</span>
         `;
         shiftContainer.appendChild(block);
@@ -221,7 +249,7 @@ function renderShiftsList() {
   shiftsListContainer.innerHTML = '';
 
   if (!currentAccount) {
-    shiftsListContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">アカウントを作成または選択してください。</p>';
+    shiftsListContainer.innerHTML = '<p class="empty-hint">アカウントを作成または選択してください。</p>';
     return;
   }
 
@@ -229,30 +257,26 @@ function renderShiftsList() {
   const dayShifts = accountShifts[selectedDateStr] || [];
 
   if (dayShifts.length === 0) {
-    shiftsListContainer.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">この日の予定はありません。</p>';
+    shiftsListContainer.innerHTML = '<p class="empty-hint">この日の予定はありません。</p>';
     return;
   }
 
   dayShifts.forEach(shift => {
     const card = document.createElement('div');
-    card.className = 'bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-xs';
+    card.className = 'entry-row';
     card.innerHTML = `
-      <div class="flex items-center gap-3">
-        <div class="bg-[#fcf7f9] p-2.5 rounded-xl border border-[#7d3b5b]/10">
-          <i data-lucide="clock" class="w-4 h-4 text-[#7d3b5b]"></i>
-        </div>
-        <div>
-          <h5 class="text-xs font-bold text-slate-800">${shift.title || '一括登録シフト'}</h5>
-          <p class="text-[11px] font-mono text-slate-500 mt-0.5">${shift.start} 〜 ${shift.end}</p>
-        </div>
+      <div class="entry-icon-circle">
+        <span class="material-icons-round">schedule</span>
       </div>
-      <div class="flex items-center gap-1">
-        <button class="edit-action-trigger p-1.5 text-slate-400 hover:text-slate-700 cursor-pointer">
-          <i data-lucide="edit-2" class="w-4 h-4"></i>
-        </button>
-        <button class="delete-action-trigger p-1.5 text-slate-400 hover:text-red-500 cursor-pointer">
-          <i data-lucide="trash-2" class="w-4 h-4"></i>
-        </button>
+      <div class="entry-main">
+        <div class="entry-top">
+          <span class="entry-title">${shift.title || '一括登録シフト'}</span>
+        </div>
+        <div class="entry-sub">${shift.start} 〜 ${shift.end}</div>
+      </div>
+      <div class="entry-actions">
+        <button class="entry-icon-btn edit-action-trigger"><span class="material-icons-round">edit</span></button>
+        <button class="entry-icon-btn danger delete-action-trigger"><span class="material-icons-round">delete</span></button>
       </div>
     `;
 
@@ -268,13 +292,11 @@ function renderShiftsList() {
 
     shiftsListContainer.appendChild(card);
   });
-
-  lucide.createIcons();
 }
 
 function openModal(isEdit = false, shift = null) {
   if (!currentAccount) return showToast('先にアカウントを選択してください');
-  
+
   modal.classList.remove('hidden');
   if (isEdit && shift) {
     editingShiftId = shift.id;
@@ -393,7 +415,7 @@ parseBtn.onclick = () => {
   if (successCount > 0) {
     localStorage.setItem('shifts_data', JSON.stringify(shiftsData));
     shorthandInput.value = '';
-    
+
     // Smoothly bounce user right back to the fresh calendar view
     switchTab('calendar');
     showToast(`${successCount}件のシフトを一括登録しました！`);
@@ -447,7 +469,7 @@ editAccountBtn.onclick = () => {
 
   // ポップアップ入力で新しい名前を求める
   const newName = prompt(`「${currentAccount}」の新しい名前を入力してください：`, currentAccount);
-  
+
   if (newName === null) return; // キャンセルされた場合
   const trimmedName = newName.trim();
   if (!trimmedName) return showToast('名前を入力してください');
@@ -455,10 +477,10 @@ editAccountBtn.onclick = () => {
   if (accounts.includes(trimmedName)) return showToast('この名前は既に登録されています');
 
   const oldAccount = currentAccount;
-  
+
   // 1. リストの登録名を更新
   accounts = accounts.map(acc => acc === oldAccount ? trimmedName : acc);
-  
+
   // 2. シフトデータのキー名も新しい名前に引っ越し
   if (shiftsData[oldAccount]) {
     shiftsData[trimmedName] = shiftsData[oldAccount];
@@ -468,7 +490,7 @@ editAccountBtn.onclick = () => {
 
   currentAccount = trimmedName;
   saveAccountsState();
-  
+
   // 3. 画面の再描画
   renderDropdown();
   renderCalendar();
@@ -483,13 +505,13 @@ deleteAccountBtn.onclick = () => {
 
   // 確認用のブラウザアラートを表示
   const confirmDelete = confirm(`「${currentAccount}」のアカウントを削除しますが大丈夫ですか？\n※この操作は取り消せません。紐づくシフトデータもすべて削除されます。`);
-  
+
   if (confirmDelete) {
     const oldAccount = currentAccount;
-    
+
     // 1. アカウント配列から除外
     accounts = accounts.filter(acc => acc !== oldAccount);
-    
+
     // 2. シフトデータからも該当アカウントの枠を削除
     if (shiftsData[oldAccount]) {
       delete shiftsData[oldAccount];
@@ -498,9 +520,9 @@ deleteAccountBtn.onclick = () => {
 
     // 3. 次に選択状態にするアカウントの決定
     currentAccount = accounts.length > 0 ? accounts[0] : '';
-    
+
     saveAccountsState();
-    
+
     // 4. 画面の再描画
     renderDropdown();
     renderCalendar();
@@ -509,10 +531,11 @@ deleteAccountBtn.onclick = () => {
     showToast(`「${oldAccount}」のアカウントを削除しました`);
   }
 };
+
 window.addEventListener('DOMContentLoaded', () => {
+  initDarkMode();
   renderDropdown();
   renderCalendar();
   renderShiftsList();
   updateSummary();
-  lucide.createIcons();
 });
